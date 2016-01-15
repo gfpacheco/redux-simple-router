@@ -41,6 +41,18 @@ export function routeReducer(state = initialState, { type, location }) {
   return { ...state, location }
 }
 
+// Control
+
+let shouldDispatchActions = true
+
+export function preventActions() {
+  shouldDispatchActions = false
+}
+
+export function allowActions() {
+  shouldDispatchActions = true
+}
+
 // Syncing
 
 export function syncHistory(history) {
@@ -50,8 +62,8 @@ export function syncHistory(history) {
   function middleware(store) {
     unsubscribeHistory = history.listen(location => {
       currentKey = location.key
-      if (syncing) {
-        // Don't dispatch a new action if we're replaying location.
+      if (syncing || !shouldDispatchActions) {
+        // Don't dispatch a new action if we're replaying location or prevented by user.
         return
       }
 
